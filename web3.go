@@ -490,7 +490,16 @@ func ConvertArgument(abiType abi.Type, param interface{}) (interface{}, error) {
 				arrayParams[i] = converted.(string)
 			}
 			return arrayParams, nil
-
+		case abi.UintTy:
+			arrayParams := make([]*big.Int, len(inputArray))
+			for i, elem := range inputArray {
+				converted, err := ConvertArgument(*abiType.Elem, elem)
+				if err != nil {
+					return nil, err
+				}
+				arrayParams[i] = converted.(*big.Int)
+			}
+			return arrayParams, nil
 		case abi.BoolTy:
 			arrayParams := make([]bool, len(inputArray))
 			for i, elem := range inputArray {
@@ -503,6 +512,7 @@ func ConvertArgument(abiType abi.Type, param interface{}) (interface{}, error) {
 			return arrayParams, nil
 
 		default:
+			fmt.Println("111111", abiType.T, abiType.Elem.T)
 			arrayParams := make([]int, len(inputArray))
 			for i, elem := range inputArray {
 				converted, err := ConvertArgument(*abiType.Elem, elem)
@@ -548,7 +558,6 @@ func ConvertArgument(abiType abi.Type, param interface{}) (interface{}, error) {
 			}
 		default:
 			if s, ok := param.(string); ok {
-				fmt.Println(s)
 				val, err := hexutil.Decode(s)
 				if err != nil {
 					return nil, fmt.Errorf("failed to parse hash %q: %v", s, err)
@@ -592,7 +601,7 @@ func convertOutputParams(params []interface{}) []interface{} {
 	return params
 }
 
-//TODO Deprecated: prefer built-in UnpackValues() func and convertOutputParams.
+// TODO Deprecated: prefer built-in UnpackValues() func and convertOutputParams.
 func convertOutputParameter(t abi.Argument) (interface{}, error) {
 	switch t.Type.T {
 	case abi.BoolTy:

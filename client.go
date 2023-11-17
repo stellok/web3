@@ -192,11 +192,14 @@ func (c *client) GetGasPrice(ctx context.Context) (*big.Int, error) {
 	if err := c.r.CallContext(ctx, &hex, "eth_gasPrice"); err != nil {
 		return nil, err
 	}
-	return (*big.Int)(&hex), nil
+	rate, _ := big.NewFloat(0).SetString("1.1")
+	gas := big.NewFloat(0).SetInt(hex.ToInt())
+	result, _ := gas.Mul(gas, rate).Int(new(big.Int))
+	return result, nil
 }
 
 func (c *client) GetPendingTransactionCount(ctx context.Context, account common.Address) (uint64, error) {
-	return c.getTransactionCount(ctx, account, "pending")
+	return c.getTransactionCount(ctx, account, "latest")
 }
 
 func (c *client) getTransactionCount(ctx context.Context, account common.Address, blockNumArg string) (uint64, error) {

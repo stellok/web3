@@ -140,7 +140,7 @@ func (b *Block) TxCount() int {
 
 type Transaction struct {
 	Nonce    uint64
-	GasPrice *big.Int // wei
+	GasPrice *big.Int `json:"gasPrice"`
 	GasLimit uint64
 	To       *common.Address
 	Value    *big.Int // wei
